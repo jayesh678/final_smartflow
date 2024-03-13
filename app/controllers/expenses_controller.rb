@@ -12,6 +12,12 @@ class ExpensesController < ApplicationController
   before_action :find_expense, only: [:edit, :update, :destroy, :approve, :cancel]
   # before_action :create_common_flow, only: [:create]
 
+
+  def home
+    @approved_expenses = Expense.joins(user: :company).where(companies: { id: current_user.company_id }, status: "approved").order(created_at: :desc).paginate(page: params[:page], per_page: 5)
+  end
+  
+
   def index
     assigned_expenses = nil
   
@@ -23,7 +29,7 @@ class ExpensesController < ApplicationController
       @expenses = current_user.expenses
     end
   
-    @expenses = @expenses.paginate(page: params[:page], per_page: 5)
+    @expenses = @expenses.order(created_at: :desc).paginate(page: params[:page], per_page: 5)
   end
   
 def create
@@ -71,7 +77,7 @@ def edit
     
   if current_user.super_admin? || current_user.id == @flow.assigned_user_id 
     if current_user.id == @flow.assigned_user_id
-      if params[:approve_button]
+      if params[:approve_button] && @expense.status != "cancelled"
         update_status_and_redirect(:approved, 'Expense was successfully approved.')
         ExpenseMailer.notify_super_admin(@expense, current_user).deliver_now
       elsif params[:cancel_button]

@@ -11,7 +11,7 @@ class UsersController < ApplicationController
     @user = current_user
     current_company = current_user.company
     @users = current_company.users
-    @users = @users.paginate(page: params[:page], per_page: 5)
+    @users = current_user.company.users.order(created_at: :desc).paginate(page: params[:page], per_page: 5)
   end
 
   def show

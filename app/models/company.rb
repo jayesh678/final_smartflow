@@ -2,6 +2,7 @@ class Company < ApplicationRecord
   has_many :users, dependent: :destroy
   before_create :generate_company_code
   before_create :generate_uniqueid
+  has_many :business_partners
   # attr_accessor :company_code
 
   private

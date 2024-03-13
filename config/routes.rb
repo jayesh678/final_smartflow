@@ -37,5 +37,5 @@
 
     resources :categories
 
-    root 'expenses#index'
+    root 'expenses#home'
   end

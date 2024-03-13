@@ -1,5 +1,6 @@
 class BusinessPartner < ApplicationRecord
     has_many :expenses
+    belongs_to :company
     # has_many :travel_expenses
 
     validates :customer_code, presence: true

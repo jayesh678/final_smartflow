@@ -177,18 +177,8 @@ pagination-links a {
 <body>
 
 <div class="card">
-  <h1>Expenses</h1>
+  <h1>Approved Expenses</h1>
   <br>
-
-  <% if @expenses.present? %>
-  <label for="category-filter">Filter by Category Type:</label>
-  <select id="category-filter">
-    <option value="all">Each Category</option>
-    <option value="Travel">Travel</option>
-    <option value="Regular">Regular</option>
-  </select>
-  <br>
-
   <div class="table-container">
     <table>
       <thead>
@@ -205,7 +195,7 @@ pagination-links a {
         </tr>
       </thead>
       <tbody id="expense-table-body">
-        <% @expenses.each do |expense| %>
+        <% @approved_expenses.each do |expense| %>
           <tr>
             <td>
               <% if expense.user %>
@@ -220,18 +210,15 @@ pagination-links a {
             <td><%= "#{expense.user.firstname} #{expense.user.lastname}" %></td>
             <td><%= expense.user.role.role_name %></td>
             <td><%= expense.category.category_type %></td>
-            
             <td>
-            <span class="status-tooltip" data-initiator-name="<%= User.find_by_id(expense.initiator_id)&.firstname %>">
-              <%= expense.status %>
-              <span class="circle initiator" data-tooltip="<%= User.find_by_id(expense.initiator_id)&.firstname %>"></span>
-            </span>
-            <span class="status-tooltip" data-approver-name="<%= User.find_by_id(expense.flow.assigned_user_id)&.firstname %>">
-              <span class="circle approver" data-tooltip="<%= User.find_by_id(expense.flow.assigned_user_id)&.firstname %>"></span>
-            </span>
-          </td>
-          
-  
+              <span class="status-tooltip" data-initiator-name="<%= User.find_by_id(expense.initiator_id)&.firstname %>">
+                <%= expense.status %>
+                <span class="circle initiator" data-tooltip="<%= User.find_by_id(expense.initiator_id)&.firstname %>"></span>
+              </span>
+              <span class="status-tooltip" data-approver-name="<%= User.find_by_id(expense.flow.assigned_user_id)&.firstname %>">
+                <span class="circle approver" data-tooltip="<%= User.find_by_id(expense.flow.assigned_user_id)&.firstname %>"></span>
+              </span>
+            </td>
             <td>
               <% if can? :read, Expense %>
                 <%= link_to user_expense_path(user_id: expense.user.id, id: expense.id), class: 'btn btn-primary btn-sm' do %>
@@ -262,25 +249,17 @@ pagination-links a {
       </tbody>
     </table>
   </div>
-  <% end %>
-
-  <div class="pagination-container">
-  <div class="add-user">
-    <%= link_to new_user_expense_path(user_id: current_user.id), class: 'button' do %>
-      <i class="fas fa-user-plus"></i> Add Expense
-    <% end %>
-  </div>
 
   <div class="col-md-auto">
     <div class="digg_pagination">
       <div class="page_info">
-        <%= page_entries_info @expenses %>
+        <%= page_entries_info @approved_expenses %>
       </div>
-      <%= will_paginate @expenses, :container => false %>
+      <%= will_paginate @approved_expenses, :container => false %>
     </div>
   </div>
 </div>
-</div>
+
 
 
 
@@ -345,43 +324,3 @@ pagination-links a {
       overflow: hidden;
     }
 </style>
-<script>
-
-document
-  .getElementById("category-filter")
-  .addEventListener("change", function () {
-    var selectedCategory = this.value;
-    var expenseRows = document.querySelectorAll("#expense-table-body tr");
-    expenseRows.forEach(function (row) {
-      var categoryCell = row.querySelector("td:nth-child(7)");
-      var category = categoryCell.textContent.trim();
-      if (selectedCategory === "all" || category === selectedCategory) {
-        row.style.display = "";
-      } else {
-        row.style.display = "none";
-      }
-    });
-  });
-
-  document.addEventListener("DOMContentLoaded", function() {
-    const expenses = document.querySelectorAll(".status-tooltip");
-  
-    expenses.forEach(function(expense) {
-      console.log(expense);
-      const circleInitiator = document.createElement("span");
-      const circleApprover = document.createElement("span");
-  
-      circleInitiator.className = "circle initiator";
-      circleInitiator.dataset.tooltip = expense.dataset.initiatorName;
-  
-      circleApprover.className = "circle approver";
-      circleApprover.dataset.tooltip = expense.dataset.approverName;
-  
-      expense.appendChild(circleInitiator);
-      expense.appendChild(circleApprover);
-    });
-  });
-  
-  
-
-</script>
